@@ -1,0 +1,63 @@
+UML
+---
+
+Board
+SIZE: int = 8
+ROWS: Tuple[str] = (1, 2, 3, 4, 5, 6, 7, 8)
+COLUMNS: Tuple[str] = (A, B, C, D, E, F, G, H)
+- board: Dict[str, Piece]
+
+Color
+WHITE: str = white
+BLACK: str = black
+
+Piece
+- color: str = WHITE|BLACK
++ get_attack_points(): Set[str]
++ can_attack_point(str): bool
+
+Chess
+- moves: List[str]
++ make_move(): None
+
+Algorithms
+----------
+
+1. make_move
+    1.1. can_move
+        1.1.1. move_color_correct
+            1.1.1.1. Even num moves and piece white
+            1.1.1.2. Odd num moves and piece black
+        1.1.2. can_attack_point
+            1.1.2.1. Destination in piece attack points
+        1.1.3. king_queen_check_ignore_point
+            1.1.3.1. Point and other color Rook or Queen share King up vertical
+            1.1.3.1. Point and other color Bishop or Queen share King up right diagonal
+            ...
+    1.2. do_move
+        1.2.1. Change state
+    1.3. end_move
+        1.3.1. king_check
+            1.3.1.1. Find other King point
+            1.3.1.2. Current pieces can attack other King point
+        1.3.2. king_checkmate
+            1.3.2.1. king_can_move
+                1.3.2.1.1. Get other King attack points
+                1.3.2.1.2. Own pieces can_move to other King attack points
+                1.3.2.1.3. Over one own piece can attack other King point
+            1.3.2.2. can_capture_attack_piece
+                1.3.2.2.1. Other piece can_move to own attack piece point
+            1.3.2.3. can_block_attack_piece
+                1.3.2.3.1. king_queen_check
+                    1.3.2.3.1.1. Other King (as Queen) can attack own Rook or Queen in up vertical
+                    1.3.2.3.1.2. Other piece can_move to point between own Rook or Queen
+                    1.3.2.3.1.3. Other King (as Queen) can attack own Bishop or Queen in up right diagonal
+                    1.3.2.3.1.4. Other piece can_move to point between own Bishop or Queen
+                    ...
+
+Limits
+------
+
+1. Pawn promotion
+2. Castle
+3. En passant
