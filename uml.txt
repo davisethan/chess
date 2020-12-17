@@ -1,20 +1,20 @@
 UML
 ---
 
-Board
+Game
 SIZE: int = 8
 ROWS: Tuple[str] = (1, 2, 3, 4, 5, 6, 7, 8)
 COLUMNS: Tuple[str] = (A, B, C, D, E, F, G, H)
-- board: Dict[str, Piece]
-
-Color
 WHITE: str = white
 BLACK: str = black
 
+Board
+- board: Dict[str, Piece]
+
 Piece
 - color: str = WHITE|BLACK
-+ get_attack_points(): Set[str]
-+ can_attack_point(str): bool
++ get_destinations_from_origin(origin: str): Set[str]
++ is_destination_from_origin(origin: str, destination: str): bool
 
 Chess
 - moves: List[str]
