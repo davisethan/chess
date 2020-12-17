@@ -9,11 +9,11 @@ class Piece(ABC):
     def get_color(self):
         return self._color
 
-    def get_destinations(self) -> Set[str]:
+    def get_destinations_from_origin(self, origin: str) -> Set[str]:
         pass
 
-    def is_destination(self, destination: str) -> bool:
-        destinations = self.get_destinations()
+    def is_destination_from_origin(self, origin:str, destination: str) -> bool:
+        destinations = self.get_destinations_from_origin(origin)
         return destination in destinations
 
     def _get_point_from_square(self, square: str) -> Tuple[int]:
