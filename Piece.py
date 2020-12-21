@@ -100,7 +100,83 @@ class Knight(Piece):
         return left_horizontal_destinations
 
 class Bishop(Piece):
-    pass
+    def get_layout_destinations_from_origin(self, layout: Dict[Tuple[int], Piece], origin: Tuple[int]) -> Set[Tuple[int]]:
+        destinations = set()
+
+        destinations |= self._get_layout_up_right_diagonal_destinations_from_origin(layout, origin)
+        destinations |= self._get_layout_down_right_diagonal_destinations_from_origin(layout, origin)
+        destinations |= self._get_layout_down_left_diagonal_destinations_from_origin(layout, origin)
+        destinations |= self._get_layout_up_left_diagonal_destinations_from_origin(layout, origin)
+
+        return destinations
+
+    def _get_layout_up_right_diagonal_destinations_from_origin(self, layout: Dict[Tuple[int], Piece], origin: Tuple[int]) -> Set[Tuple[int]]:
+        row = origin[0]
+        column = origin[1]
+        up_right_diagonal_destinations = set()
+        index = 1
+        destination = (row - index, column + index)
+
+        while 0 <= row - index and Game.SIZE > column + index and destination not in layout:
+            up_right_diagonal_destinations.add(destination)
+            index += 1
+            destination = (row - index, column + index)
+
+        if destination in layout and self._color != layout[destination].get_color():
+            up_right_diagonal_destinations.add(destination)
+
+        return up_right_diagonal_destinations
+
+    def _get_layout_down_right_diagonal_destinations_from_origin(self, layout: Dict[Tuple[int], Piece], origin: Tuple[int]) -> Set[Tuple[int]]:
+        row = origin[0]
+        column = origin[1]
+        down_right_diagonal_destinations = set()
+        index = 1
+        destination = (row + index, column + index)
+
+        while Game.SIZE > row + index and Game.SIZE > column + index and destination not in layout:
+            down_right_diagonal_destinations.add(destination)
+            index += 1
+            destination = (row + index, column + index)
+
+        if destination in layout and self._color != layout[destination].get_color():
+            down_right_diagonal_destinations.add(destination)
+
+        return down_right_diagonal_destinations
+
+    def _get_layout_down_left_diagonal_destinations_from_origin(self, layout: Dict[Tuple[int], Piece], origin: Tuple[int]) -> Set[Tuple[int]]:
+        row = origin[0]
+        column = origin[1]
+        down_left_diagonal_destinations = set()
+        index = 1
+        destination = (row + index, column - index)
+
+        while Game.SIZE > row + index and 0 <= column - index and destination not in layout:
+            down_left_diagonal_destinations.add(destination)
+            index += 1
+            destination = (row + index, column - index)
+
+        if destination in layout and self._color != layout[destination].get_color():
+            down_left_diagonal_destinations.add(destination)
+
+        return down_left_diagonal_destinations
+
+    def _get_layout_up_left_diagonal_destinations_from_origin(self, layout: Dict[Tuple[int], Piece], origin: Tuple[int]) -> Set[Tuple[int]]:
+        row = origin[0]
+        column = origin[1]
+        up_left_diagonal_destinations = set()
+        index = 1
+        destination = (row - index, column - index)
+
+        while 0 <= row - index and 0 <= column - index and destination not in layout:
+            up_left_diagonal_destinations.add(destination)
+            index += 1
+            destination = (row - index, column - index)
+
+        if destination in layout and self._color != layout[destination].get_color():
+            up_left_diagonal_destinations.add(destination)
+
+        return up_left_diagonal_destinations
 
 class Rook(Piece):
     pass
