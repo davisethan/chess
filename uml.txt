@@ -42,7 +42,6 @@ Algorithms
             1.1.3.1. Save layout memento
             1.1.3.2. do move
             1.1.3.3. Is King origin a destination of any other color piece
-            ...
     1.2. do_move
         1.2.1. Change state
     1.3. end_move
