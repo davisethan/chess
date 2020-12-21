@@ -3,7 +3,7 @@ from abc import ABC
 from Game import Game
 
 class Piece(ABC):
-    def __init__(self, color: str) -> None:
+    def __init__(self, color: str = Game.WHITE) -> None:
         self._color = color
 
     def get_color(self):
@@ -182,14 +182,14 @@ class Rook(Piece):
     def get_layout_destinations_from_origin(self, layout: Dict[Tuple[int], Piece], origin: Tuple[int]) -> Set[Tuple[int]]:
         destinations = set()
 
-        destinations |= self._get_up_vertical_destinations_from_origin(layout, origin)
-        destinations |= self._get_right_horizontal_destinations_from_origin(layout, origin)
-        destinations |= self._get_down_vertical_destinations_from_origin(layout, origin)
-        destinations |= self._get_left_horizontal_destinations_from_origin(layout, origin)
+        destinations |= self._get_layout_up_vertical_destinations_from_origin(layout, origin)
+        destinations |= self._get_layout_right_horizontal_destinations_from_origin(layout, origin)
+        destinations |= self._get_layout_down_vertical_destinations_from_origin(layout, origin)
+        destinations |= self._get_layout_left_horizontal_destinations_from_origin(layout, origin)
 
         return destinations
 
-    def _get_up_vertical_destinations_from_origin(self, layout: Dict[Tuple[int], Piece], origin: Tuple[int]) -> Set[Tuple[int]]:
+    def _get_layout_up_vertical_destinations_from_origin(self, layout: Dict[Tuple[int], Piece], origin: Tuple[int]) -> Set[Tuple[int]]:
         row = origin[0]
         column = origin[1]
         up_vertical_destinations = set()
@@ -206,7 +206,7 @@ class Rook(Piece):
 
         return up_vertical_destinations
 
-    def _get_right_horizontal_destinations_from_origin(self, layout: Dict[Tuple[int], Piece], origin: Tuple[int]) -> Set[Tuple[int]]:
+    def _get_layout_right_horizontal_destinations_from_origin(self, layout: Dict[Tuple[int], Piece], origin: Tuple[int]) -> Set[Tuple[int]]:
         row = origin[0]
         column = origin[1]
         right_horizontal_destinations = set()
@@ -223,7 +223,7 @@ class Rook(Piece):
 
         return right_horizontal_destinations
 
-    def _get_down_vertical_destinations_from_origin(self, layout: Dict[Tuple[int], Piece], origin: Tuple[int]) -> Set[Tuple[int]]:
+    def _get_layout_down_vertical_destinations_from_origin(self, layout: Dict[Tuple[int], Piece], origin: Tuple[int]) -> Set[Tuple[int]]:
         row = origin[0]
         column = origin[1]
         down_vertical_destinations = set()
@@ -240,7 +240,7 @@ class Rook(Piece):
 
         return down_vertical_destinations
 
-    def _get_left_horizontal_destinations_from_origin(self, layout: Dict[Tuple[int], Piece], origin: Tuple[int]) -> Set[Tuple[int]]:
+    def _get_layout_left_horizontal_destinations_from_origin(self, layout: Dict[Tuple[int], Piece], origin: Tuple[int]) -> Set[Tuple[int]]:
         row = origin[0]
         column = origin[1]
         left_horizontal_destinations = set()
@@ -258,7 +258,13 @@ class Rook(Piece):
         return left_horizontal_destinations
 
 class Queen(Piece):
-    pass
+    def get_layout_destinations_from_origin(self, layout: Dict[Tuple[int], Piece], origin: Tuple[int]) -> Set[Tuple[int]]:
+        destinations = set()
+
+        destinations |= Bishop().get_layout_destinations_from_origin(layout, origin)
+        destinations |= Rook().get_layout_destinations_from_origin(layout, origin)
+
+        return destinations
 
 class King(Piece):
     pass

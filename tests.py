@@ -1,7 +1,7 @@
 import unittest
 from Board import Board
 from Game import Game
-from Piece import Pawn, Knight, Bishop, Rook
+from Piece import Pawn, Knight, Bishop, Rook, Queen
 
 class BoardTestCase(unittest.TestCase):
     def test_board_get_destinations_from_origin(self):
@@ -161,6 +161,30 @@ class BoardTestCase(unittest.TestCase):
                     (4, 0): Pawn(Game.BLACK)
                 },
                 "expected_destinations": {(3, 2), (4, 3), (5, 2), (6, 2), (4, 1), (4, 0)}
+            },
+            {
+                "name": "queen",
+                "origin": (4, 2),
+                "layout": {
+                    (4, 2): Queen(Game.WHITE)
+                },
+                "expected_destinations": {(3, 3), (2, 4), (1, 5), (0, 6), (5, 3), (6, 4), (7, 5), (5, 1), (6, 0), (3, 1), (2, 0), (3, 2), (2, 2), (1, 2), (0, 2), (4, 3), (4, 4), (4, 5), (4, 6), (4, 7), (5, 2), (6, 2), (7, 2), (4, 1), (4, 0)}
+            },
+            {
+                "name": "queen_and_pieces",
+                "origin": (4, 2),
+                "layout": {
+                    (4, 2): Queen(Game.WHITE),
+                    (2, 0): Pawn(Game.WHITE),
+                    (2, 2): Pawn(Game.WHITE),
+                    (2, 4): Pawn(Game.WHITE),
+                    (4, 4): Pawn(Game.WHITE),
+                    (6, 4): Pawn(Game.BLACK),
+                    (6, 2): Pawn(Game.BLACK),
+                    (6, 0): Pawn(Game.BLACK),
+                    (4, 0): Pawn(Game.BLACK)
+                },
+                "expected_destinations": {(3, 1), (3, 2), (3, 3), (4, 3), (5, 3), (6, 4), (5, 2), (6, 2), (5, 1), (6, 0), (4, 1), (4, 0)}
             }
         ]
         for case in cases:
