@@ -267,4 +267,97 @@ class Queen(Piece):
         return destinations
 
 class King(Piece):
-    pass
+    def get_layout_destinations_from_origin(self, layout: Dict[Tuple[int], Piece], origin: Tuple[int]) -> Set[Tuple[int]]:
+        destinations = set()
+
+        destinations |= self._get_up_vertical_destinations_from_origin(origin)
+        destinations |= self._get_up_right_diagonal_destinations_from_origin(origin)
+        destinations |= self._get_right_horizontal_destinations_from_origin(origin)
+        destinations |= self._get_down_right_diagonal_destinations_from_origin(origin)
+        destinations |= self._get_down_vertical_destinations_from_origin(origin)
+        destinations |= self._get_down_left_diagonal_destinations_from_origin(origin)
+        destinations |= self._get_left_horizontal_destinations_from_origin(origin)
+        destinations |= self._get_up_left_diagonal_destinations_from_origin(origin)
+        destinations = self._filter_layout_destinations_by_color(layout, destinations)
+
+        return destinations
+
+    def _get_up_vertical_destinations_from_origin(self, origin: Tuple[int]) -> Set[Tuple[int]]:
+        row = origin[0]
+        column = origin[1]
+        destinations = set()
+        
+        if 0 <= row - 1:
+            destinations.add((row - 1, column))
+
+        return destinations
+
+    def _get_up_right_diagonal_destinations_from_origin(self, origin: Tuple[int]) -> Set[Tuple[int]]:
+        row = origin[0]
+        column = origin[1]
+        destinations = set()
+        
+        if 0 <= row - 1 and Game.SIZE > column + 1:
+            destinations.add((row - 1, column + 1))
+
+        return destinations
+
+    def _get_right_horizontal_destinations_from_origin(self, origin: Tuple[int]) -> Set[Tuple[int]]:
+        row = origin[0]
+        column = origin[1]
+        destinations = set()
+        
+        if Game.SIZE > column + 1:
+            destinations.add((row, column + 1))
+
+        return destinations
+
+    def _get_down_right_diagonal_destinations_from_origin(self, origin: Tuple[int]) -> Set[Tuple[int]]:
+        row = origin[0]
+        column = origin[1]
+        destinations = set()
+        
+        if Game.SIZE > row + 1 and Game.SIZE > column + 1:
+            destinations.add((row + 1, column + 1))
+
+        return destinations
+
+    def _get_down_vertical_destinations_from_origin(self, origin: Tuple[int]) -> Set[Tuple[int]]:
+        row = origin[0]
+        column = origin[1]
+        destinations = set()
+        
+        if Game.SIZE > row + 1:
+            destinations.add((row + 1, column))
+
+        return destinations
+
+    def _get_down_left_diagonal_destinations_from_origin(self, origin: Tuple[int]) -> Set[Tuple[int]]:
+        row = origin[0]
+        column = origin[1]
+        destinations = set()
+        
+        if Game.SIZE > row + 1 and 0 <= column - 1:
+            destinations.add((row + 1, column - 1))
+
+        return destinations
+
+    def _get_left_horizontal_destinations_from_origin(self, origin: Tuple[int]) -> Set[Tuple[int]]:
+        row = origin[0]
+        column = origin[1]
+        destinations = set()
+        
+        if 0 <= column - 1:
+            destinations.add((row, column - 1))
+
+        return destinations
+
+    def _get_up_left_diagonal_destinations_from_origin(self, origin: Tuple[int]) -> Set[Tuple[int]]:
+        row = origin[0]
+        column = origin[1]
+        destinations = set()
+        
+        if 0<= row - 1 and 0 <= column - 1:
+            destinations.add((row - 1, column - 1))
+
+        return destinations
