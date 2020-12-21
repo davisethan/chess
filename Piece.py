@@ -357,7 +357,7 @@ class King(Piece):
         column = origin[1]
         destinations = set()
         
-        if 0<= row - 1 and 0 <= column - 1:
+        if 0 <= row - 1 and 0 <= column - 1:
             destinations.add((row - 1, column - 1))
 
         return destinations
