@@ -17,6 +17,7 @@ BLACK_PAWN_ROW: int = 1
 
 Board
 - layout: Dict[str, Piece]
+- moves: List[str]
 + get_destinations_from_orgin(origin: Tuple[int]) -> Set[Tuple[int]]
 + is_destination_from_origin(origin: Tuple[int]) -> bool
 
@@ -25,7 +26,6 @@ Piece
 + get_layout_destinations_from_origin(layout: Dict[Tuple[int], Piece], origin: str) -> Set[str]
 
 Chess
-- moves -> List[str]
 + make_move() -> None
 
 Algorithms
