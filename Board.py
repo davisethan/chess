@@ -60,12 +60,50 @@ class Board:
 
     def move_from_origin_to_destination_makes_king_with_color_check(self, origin: Tuple[int], destination: Tuple[int], color: str) -> bool:
         memento = dict(self._layout)
+        # Do move
         self._layout[destination] = self._layout[origin]
         self._layout.pop(origin)
+        # King check
         king_check = self.king_with_color_check(color)
         if king_check:
             self._layout = memento
         return king_check
+
+    def king_with_color_can_move(self, color: str) -> bool:
+        king_origin = tuple()
+        for origin in self._layout:
+            if isinstance(self._layout[origin], King) and color == self._layout[origin].get_color():
+                king_origin = origin
+        king_destinations = self._get_destinations_from_origin(king_origin)
+
+        other_color_destinations = set()
+        for origin in self._layout:
+            if color != self._layout[origin].get_color():
+                other_color_destinations |= self._get_destinations_from_origin(origin)
+
+        return 0 < len(king_destinations - other_color_destinations)
+
+    def can_capture_king_with_color_attacker(self, color: str) -> bool:
+        king_origin = tuple()
+        for origin in self._layout:
+            if isinstance(self._layout[origin], King) and color == self._layout[origin].get_color():
+                king_origin = origin
+
+        king_attacker_origins = set()
+        same_color_destinations = set()
+        for origin in self._layout:
+            if king_origin in self._get_destinations_from_origin(origin):
+                king_attacker_origins.add(origin)
+            if color == self._layout[origin].get_color():
+                same_color_destinations |= self._get_destinations_from_origin(origin)
+
+        if 1 < len(king_attacker_origins):
+            return False
+        
+        if 0 < len(king_attacker_origins & same_color_destinations):
+            return True
+        else:
+            return False
 
 
     def set_move(self, move: str) -> None:

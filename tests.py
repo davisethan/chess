@@ -169,7 +169,78 @@ class KingCheckTestCase(unittest.TestCase):
 
                 self.assertEqual(case["expected_king_check"], actual_king_check)
 
-        
+    def test_king_with_color_can_move(self):
+        cases = [
+            {
+                "name": "king_can_move",
+                "layout": {
+                    (6, 2): King(Game.WHITE),
+                    (3, 2): Rook(Game.BLACK)
+                },
+                "expected_king_can_move": True
+            },
+            {
+                "name": "king_can_not_move",
+                "layout": {
+                    (6, 2): King(Game.WHITE),
+                    (5, 1): Knight(Game.WHITE),
+                    (6, 1): Knight(Game.WHITE),
+                    (7, 1): Knight(Game.WHITE),
+                    (7, 2): Knight(Game.WHITE),
+                    (7, 3): Knight(Game.WHITE),
+                    (6, 3): Knight(Game.WHITE),
+                    (5, 3): Knight(Game.WHITE),
+                    (3, 2): Rook(Game.BLACK)
+                },
+                "expected_king_can_move": False
+            }
+        ]
+        for case in cases:
+            with self.subTest(case["name"]):
+                board = Board(case["layout"])
+
+                actual_king_can_move = board.king_with_color_can_move(Game.WHITE)
+
+                self.assertEqual(case["expected_king_can_move"], actual_king_can_move)
+
+    def test_can_capture_king_with_color_attacker(self):
+        cases = [
+            {
+                "name": "can_capture_king_attacker",
+                "layout": {
+                    (6, 2): King(Game.WHITE),
+                    (3, 2): Rook(Game.BLACK),
+                    (3, 3): Queen(Game.WHITE)
+                },
+                "expected_can_capture_king_attacker": True
+            },
+            {
+                "name": "two_attackers_can_not_capture_king_attacker",
+                "layout": {
+                    (6, 2): King(Game.WHITE),
+                    (3, 2): Rook(Game.BLACK),
+                    (3, 3): Queen(Game.WHITE),
+                    (5, 4): Knight(Game.BLACK)
+                },
+                "expected_can_capture_king_attacker": False
+            },
+            {
+                "name": "can_not_capture_king_attacker",
+                "layout": {
+                    (6, 2): King(Game.WHITE),
+                    (3, 2): Rook(Game.BLACK),
+                    (5, 3): Queen(Game.WHITE)
+                },
+                "expected_can_capture_king_attacker": False
+            }
+        ]
+        for case in cases:
+            with self.subTest(case["name"]):
+                board = Board(case["layout"])
+
+                actual_can_capture_king_attacker = board.can_capture_king_with_color_attacker(Game.WHITE)
+
+                self.assertEqual(case["expected_can_capture_king_attacker"], actual_can_capture_king_attacker)
 
 class BoardGetDestinationsFromOriginTestCase(unittest.TestCase):
     def test_board_get_destinations_from_origin(self):
