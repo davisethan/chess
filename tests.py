@@ -3,7 +3,50 @@ from Board import Board
 from Game import Game
 from Piece import Pawn, Knight, Bishop, Rook, Queen, King
 
-class BoardTestCase(unittest.TestCase):
+class BoardCanMoveTestCase(unittest.TestCase):
+    def test_board_white_origin_correct_color(self):
+        cases = [
+            {
+                "name": "white_move",
+                "origin": (6, 0),
+                "expected_origin_correct_color": True
+            },
+            {
+                "name": "black_move",
+                "origin": (1, 0),
+                "expected_origin_correct_color": False
+            }
+        ]
+        for case in cases:
+            with self.subTest(case["name"]):
+                board = Board()
+
+                actual_origin_correct_color = board._origin_correct_color(case["origin"])
+
+                self.assertEqual(case["expected_origin_correct_color"], actual_origin_correct_color)
+
+    def test_board_black_origin_correct_color(self):
+        cases = [
+            {
+                "name": "black_move",
+                "origin": (1, 0),
+                "expected_origin_correct_color": True
+            },
+            {
+                "name": "white_move",
+                "origin": (6, 0),
+                "expected_origin_correct_color": False
+            }
+        ]
+        for case in cases:
+            with self.subTest(case["name"]):
+                board = Board()
+                board.add_move("PA2A3")
+
+                actual_origin_correct_color = board._origin_correct_color(case["origin"])
+
+                self.assertEqual(case["expected_origin_correct_color"], actual_origin_correct_color)
+
     def test_board_get_destinations_from_origin(self):
         cases = [
             {
@@ -215,9 +258,43 @@ class BoardTestCase(unittest.TestCase):
             with self.subTest(case["name"]):
                 board = Board(case["layout"])
 
-                actual_destinations = board.get_destinations_from_origin(case["origin"])
+                actual_destinations = board._get_destinations_from_origin(case["origin"])
 
                 self.assertEqual(case["expected_destinations"], actual_destinations)
+
+    def test_board_current_king_check_from_origin_to_destination(self):
+        cases = [
+            {
+                "name": "current_king_check",
+                "origin": (5, 2),
+                "destination": (5, 3),
+                "layout": {
+                    (6, 2): King(Game.WHITE),
+                    (5, 2): Queen(Game.WHITE),
+                    (3, 2): Rook(Game.BLACK)
+                },
+                "expected_current_king_check_from_origin_to_destination": True
+            },
+            {
+                "name": "not_current_king_check",
+                "origin": (5, 2),
+                "destination": (5, 3),
+                "layout": {
+                    (6, 3): King(Game.WHITE),
+                    (5, 2): Queen(Game.WHITE),
+                    (3, 2): Rook(Game.BLACK)
+                },
+                "expected_current_king_check_from_origin_to_destination": False
+            }
+        ]
+        for case in cases:
+            with self.subTest(case["name"]):
+                board = Board(case["layout"])
+
+                actual_current_king_check_from_origin_to_destination = board._current_king_check_from_origin_to_destination(case["origin"], case["destination"])
+
+                self.assertEqual(case["expected_current_king_check_from_origin_to_destination"], actual_current_king_check_from_origin_to_destination)
+
         
 
 if __name__ == "__main__":

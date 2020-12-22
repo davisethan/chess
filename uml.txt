@@ -3,22 +3,30 @@ UML
 
 Game
 SIZE: int = 8
-ROWS: Tuple[str] = (1, 2, 3, 4, 5, 6, 7, 8)
-COLUMNS: Tuple[str] = (A, B, C, D, E, F, G, H)
-WHITE: str = white
-BLACK: str = black
+ROWS: Tuple[str] = ("1", "2", "3", "4", "5", "6", "7", "8")
+COLUMNS: Tuple[str] = ("A", "B", "C", "D", "E", "F", "G", "H")
+WHITE: str = "WHITE"
+BLACK: str = "BLACK"
+CHECK: str = "CHECK"
+CHECKMATE: str = "CHECKMATE"
+WHITE_WON: str = "WHITE_WON"
+BLACK_WON: str = "BLACK_WON"
+UNFINISHED: str = "UNFINISHED"
+WHITE_PAWN_ROW: int = 6
+BLACK_PAWN_ROW: int = 1
 
 Board
-- board: Dict[str, Piece]
+- layout: Dict[str, Piece]
+- moves: List[str]
++ get_destinations_from_orgin(origin: Tuple[int]) -> Set[Tuple[int]]
++ is_destination_from_origin(origin: Tuple[int]) -> bool
 
 Piece
-- color: str = WHITE|BLACK
-+ get_destinations_from_origin(origin: str): Set[str]
-+ is_destination_from_origin(origin: str, destination: str): bool
+- color: str = "WHITE" | "BLACK"
++ get_layout_destinations_from_origin(layout: Dict[Tuple[int], Piece], origin: str) -> Set[str]
 
 Chess
-- moves: List[str]
-+ make_move(): None
++ make_move() -> None
 
 Algorithms
 ----------
@@ -28,12 +36,12 @@ Algorithms
         1.1.1. move_color_correct
             1.1.1.1. Even num moves and piece white
             1.1.1.2. Odd num moves and piece black
-        1.1.2. can_attack_point
-            1.1.2.1. Destination in piece attack points
-        1.1.3. king_queen_check_ignore_point
-            1.1.3.1. Point and other color Rook or Queen share King up vertical
-            1.1.3.1. Point and other color Bishop or Queen share King up right diagonal
-            ...
+        1.1.2. is_destination_from_origin
+            1.1.2.1. Destination in destinations from piece at origin
+        1.1.3. is_king_check
+            1.1.3.1. Save layout memento
+            1.1.3.2. do move
+            1.1.3.3. Is King origin a destination of any other color piece
     1.2. do_move
         1.2.1. Change state
     1.3. end_move
@@ -54,6 +62,11 @@ Algorithms
                     1.3.2.3.1.3. Other King (as Queen) can attack own Bishop or Queen in up right diagonal
                     1.3.2.3.1.4. Other piece can_move to point between own Bishop or Queen
                     ...
+
+Design Patterns
+---------------
+
+Memento: King check
 
 Limits
 ------

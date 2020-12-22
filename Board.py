@@ -1,6 +1,6 @@
-from typing import Set, Tuple
+from typing import Dict, Set, Tuple
 from Game import Game
-from Piece import Pawn, Knight, Bishop, Rook, Queen, King
+from Piece import Piece, Pawn, Knight, Bishop, Rook, Queen, King
 
 class Board:
     def __init__(self, layout = {}) -> None:
@@ -40,22 +40,93 @@ class Board:
         }
 
         self._layout = layout or default_layout
+        self._moves = []
 
-    def get_destinations_from_origin(self, origin: Tuple[int]) -> Set[Tuple[int]]:
+    def add_move(self, move: str) -> None:
+        self._moves.append(move)
+
+    def _can_move_from_origin_to_destination(self, origin: Tuple[int], destination: Tuple[int]) -> bool:
+        if not self._origin_correct_color(origin):
+            return False
+        elif destination not in self._get_destinations_from_origin(origin):
+            return False
+        elif self._current_king_check_from_origin_to_destination(origin, destination):
+            return False
+        else:
+            return True
+
+    def _origin_correct_color(self, origin: Tuple[int]) -> bool:
+        piece = self._layout[origin]
+        if 0 == len(self._moves) % 2 and Game.WHITE == piece.get_color():
+            return True
+        elif 1 == len(self._moves) % 2 and Game.BLACK == piece.get_color():
+            return True
+        else:
+            return False
+
+    def _get_destinations_from_origin(self, origin: Tuple[int]) -> Set[Tuple[int]]:
         if origin not in self._layout:
             return set()
         piece = self._layout[origin]
         destinations = piece.get_layout_destinations_from_origin(self._layout, origin)
         return destinations
 
-    def _get_point_from_square(self, square: str) -> Tuple[int]:
-        """From [A-H][1-8] to ([0-7],[0-7])"""
-        point_x = Game.ROWS[::-1].index(square[1])
-        point_y = Game.COLUMNS.index(square[0])
-        return (point_x, point_y)
+    def _current_king_check_from_origin_to_destination(self, origin: Tuple[int], destination: Tuple[int]) -> bool:
+        current_color = self._get_current_color()
+        other_color = self._get_other_color()
+        layout_copy = self._get_layout_from_origin_to_destination(origin, destination)
+        current_king_origin = self._get_current_king_origin_from_current_color_and_layout(current_color, layout_copy)
+        other_pieces_destinations = self._get_other_pieces_destinations_from_other_color_and_layout(other_color, layout_copy)
 
-    def _get_square_from_point(self, point: Tuple[int]) -> str:
-        """From ([0-7],[0-7]) to [A-H][1-8]"""
-        square_row = Game.ROWS[::-1][point[0]]
-        square_column = Game.COLUMNS[point[1]]
-        return f"{square_column}{square_row}"
+        return current_king_origin in other_pieces_destinations
+
+    def _get_current_color(self) -> str:
+        if 0 == len(self._moves) % 2:
+            return Game.WHITE
+        else:
+            return Game.BLACK
+
+    def _get_other_color(self) -> str:
+        if 0 == len(self._moves) % 2:
+            return Game.BLACK
+        else:
+            return Game.WHITE
+
+    def _get_layout_from_origin_to_destination(self, origin: Tuple[int], destination: Tuple[int]) -> Dict[Tuple[int], Piece]:
+        layout_copy = dict(self._layout)
+        layout_copy[destination] = layout_copy[origin]
+        del layout_copy[origin]
+
+        return layout_copy
+
+    def _get_current_king_origin_from_current_color_and_layout(self, current_color: str, layout: Dict[Tuple[int], Piece]) -> Tuple[int]:
+        current_king_origin = tuple()
+        
+        for origin in layout:
+            piece = layout[origin]
+            if isinstance(piece, King) and current_color == piece.get_color():
+                current_king_origin = origin
+
+        return current_king_origin
+
+    def _get_other_pieces_destinations_from_other_color_and_layout(self, other_color: str, layout: Dict[Tuple[int], Piece]) -> Set[Tuple[int]]:
+        other_pieces_destinations = set()
+        
+        for origin in layout:
+            piece = layout[origin]
+            if other_color == piece.get_color():
+                other_pieces_destinations |= piece.get_layout_destinations_from_origin(layout, origin)
+
+        return other_pieces_destinations
+
+    # def _get_point_from_square(self, square: str) -> Tuple[int]:
+    #     """From [A-H][1-8] to ([0-7],[0-7])"""
+    #     point_x = Game.ROWS[::-1].index(square[1])
+    #     point_y = Game.COLUMNS.index(square[0])
+    #     return (point_x, point_y)
+
+    # def _get_square_from_point(self, point: Tuple[int]) -> str:
+    #     """From ([0-7],[0-7]) to [A-H][1-8]"""
+    #     square_row = Game.ROWS[::-1][point[0]]
+    #     square_column = Game.COLUMNS[point[1]]
+    #     return f"{square_column}{square_row}"
