@@ -3,50 +3,175 @@ from Board import Board
 from Game import Game
 from Piece import Pawn, Knight, Bishop, Rook, Queen, King
 
-class BoardCanMoveTestCase(unittest.TestCase):
-    def test_board_white_origin_correct_color(self):
+# class BoardOriginCorrectColorTestCase(unittest.TestCase):
+#     def test_board_white_origin_correct_color(self):
+#         cases = [
+#             {
+#                 "name": "white_move",
+#                 "origin": (6, 0),
+#                 "expected_origin_correct_color": True
+#             },
+#             {
+#                 "name": "black_move",
+#                 "origin": (1, 0),
+#                 "expected_origin_correct_color": False
+#             }
+#         ]
+#         for case in cases:
+#             with self.subTest(case["name"]):
+#                 board = Board()
+
+#                 actual_origin_correct_color = board._origin_correct_color(case["origin"])
+
+#                 self.assertEqual(case["expected_origin_correct_color"], actual_origin_correct_color)
+
+#     def test_board_black_origin_correct_color(self):
+#         cases = [
+#             {
+#                 "name": "black_move",
+#                 "origin": (1, 0),
+#                 "expected_origin_correct_color": True
+#             },
+#             {
+#                 "name": "white_move",
+#                 "origin": (6, 0),
+#                 "expected_origin_correct_color": False
+#             }
+#         ]
+#         for case in cases:
+#             with self.subTest(case["name"]):
+#                 board = Board()
+#                 board.add_move("PA2A3")
+
+#                 actual_origin_correct_color = board._origin_correct_color(case["origin"])
+
+#                 self.assertEqual(case["expected_origin_correct_color"], actual_origin_correct_color)
+
+# class BoardCanMove(unittest.TestCase):
+#     def test_board_is_correct_move_format(self):
+#         cases = [
+#             {
+#                 "name": "correct_move_format",
+#                 "move": "PA2A3",
+#                 "expected_is_correct_move_format": True
+#             },
+#             {
+#                 "name": "not_correct_move_format",
+#                 "move": "ZA2A3",
+#                 "expected_is_correct_move_format": False
+#             }
+#         ]
+#         for case in cases:
+#             with self.subTest(case["name"]):
+#                 board = Board()
+#                 board.set_move(case["move"])
+
+#                 actual_is_correct_move_format = board._is_correct_move_format()
+
+#                 self.assertEqual(case["expected_is_correct_move_format"], actual_is_correct_move_format)
+
+#     def test_board_is_correct_origin_piece(self):
+#         cases = [
+#             {
+#                 "name": "correct_origin_piece",
+#                 "move": "PA2A3",
+#                 "expected_is_correct_origin_piece": True
+#             },
+#             {
+#                 "name": "origin_wrong_piece",
+#                 "move": "NA2A3",
+#                 "expected_is_correct_origin_piece": False
+#             },
+#             {
+#                 "name": "origin_no_piece",
+#                 "move": "PA3A4",
+#                 "expected_is_correct_origin_piece": False
+#             }
+#         ]
+#         for case in cases:
+#             with self.subTest(case["name"]):
+#                 board = Board()
+#                 board.set_move(case["move"])
+
+#                 actual_is_correct_origin_piece = board._is_correct_origin_piece()
+
+#                 self.assertEqual(case["expected_is_correct_origin_piece"], actual_is_correct_origin_piece)
+
+#     def test_board_is_correct_origin_color(self):
+#         move = "PA2A3"
+#         board = Board()
+#         board.set_move(move)
+#         expected_is_correct_origin_color = True
+
+#         actual_is_correct_origin_color = board._is_correct_origin_color()
+
+#         self.assertEqual(expected_is_correct_origin_color, actual_is_correct_origin_color)
+
+class KingCheckTestCase(unittest.TestCase):
+    def test_king_check(self):
         cases = [
             {
-                "name": "white_move",
-                "origin": (6, 0),
-                "expected_origin_correct_color": True
+                "name": "king_check",
+                "layout": {
+                    (6, 2): King(Game.WHITE),
+                    (3, 2): Rook(Game.BLACK)
+                },
+                "expected_king_check": True
             },
             {
-                "name": "black_move",
-                "origin": (1, 0),
-                "expected_origin_correct_color": False
+                "name": "not_king_check",
+                "layout": {
+                    (6, 2): King(Game.WHITE),
+                    (5, 2): Queen(Game.WHITE),
+                    (3, 2): Rook(Game.BLACK)
+                },
+                "expected_king_check": False
             }
         ]
         for case in cases:
             with self.subTest(case["name"]):
-                board = Board()
+                board = Board(case["layout"])
 
-                actual_origin_correct_color = board._origin_correct_color(case["origin"])
+                actual_king_check = board.king_with_color_check(Game.WHITE)
 
-                self.assertEqual(case["expected_origin_correct_color"], actual_origin_correct_color)
+                self.assertEqual(case["expected_king_check"], actual_king_check)
 
-    def test_board_black_origin_correct_color(self):
+    def test_move_from_origin_to_destination_makes_king_with_color_check(self):
         cases = [
             {
-                "name": "black_move",
-                "origin": (1, 0),
-                "expected_origin_correct_color": True
+                "name": "king_check",
+                "layout": {
+                    (6, 2): King(Game.WHITE),
+                    (5, 2): Queen(Game.WHITE),
+                    (3, 2): Rook(Game.BLACK)
+                },
+                "origin": (5, 2),
+                "destination": (5, 3),
+                "expected_king_check": True
             },
             {
-                "name": "white_move",
-                "origin": (6, 0),
-                "expected_origin_correct_color": False
+                "name": "not_king_check",
+                "layout": {
+                    (6, 3): King(Game.WHITE),
+                    (5, 2): Queen(Game.WHITE),
+                    (3, 2): Rook(Game.BLACK)
+                },
+                "origin": (5, 2),
+                "destination": (5, 3),
+                "expected_king_check": False
             }
         ]
         for case in cases:
             with self.subTest(case["name"]):
-                board = Board()
-                board.add_move("PA2A3")
+                board = Board(case["layout"])
 
-                actual_origin_correct_color = board._origin_correct_color(case["origin"])
+                actual_king_check = board.move_from_origin_to_destination_makes_king_with_color_check(case["origin"], case["destination"], Game.WHITE)
 
-                self.assertEqual(case["expected_origin_correct_color"], actual_origin_correct_color)
+                self.assertEqual(case["expected_king_check"], actual_king_check)
 
+        
+
+class BoardGetDestinationsFromOriginTestCase(unittest.TestCase):
     def test_board_get_destinations_from_origin(self):
         cases = [
             {
@@ -262,40 +387,79 @@ class BoardCanMoveTestCase(unittest.TestCase):
 
                 self.assertEqual(case["expected_destinations"], actual_destinations)
 
-    def test_board_current_king_check_from_origin_to_destination(self):
-        cases = [
-            {
-                "name": "current_king_check",
-                "origin": (5, 2),
-                "destination": (5, 3),
-                "layout": {
-                    (6, 2): King(Game.WHITE),
-                    (5, 2): Queen(Game.WHITE),
-                    (3, 2): Rook(Game.BLACK)
-                },
-                "expected_current_king_check_from_origin_to_destination": True
-            },
-            {
-                "name": "not_current_king_check",
-                "origin": (5, 2),
-                "destination": (5, 3),
-                "layout": {
-                    (6, 3): King(Game.WHITE),
-                    (5, 2): Queen(Game.WHITE),
-                    (3, 2): Rook(Game.BLACK)
-                },
-                "expected_current_king_check_from_origin_to_destination": False
-            }
-        ]
-        for case in cases:
-            with self.subTest(case["name"]):
-                board = Board(case["layout"])
+# class BoardCurrentKingCheckFromOriginToDestination(unittest.TestCase):
+#     def test_board_current_king_check_from_origin_to_destination(self):
+#         cases = [
+#             {
+#                 "name": "current_king_check",
+#                 "origin": (5, 2),
+#                 "destination": (5, 3),
+#                 "layout": {
+#                     (6, 2): King(Game.WHITE),
+#                     (5, 2): Queen(Game.WHITE),
+#                     (3, 2): Rook(Game.BLACK)
+#                 },
+#                 "expected_current_king_check_from_origin_to_destination": True
+#             },
+#             {
+#                 "name": "not_current_king_check",
+#                 "origin": (5, 2),
+#                 "destination": (5, 3),
+#                 "layout": {
+#                     (6, 3): King(Game.WHITE),
+#                     (5, 2): Queen(Game.WHITE),
+#                     (3, 2): Rook(Game.BLACK)
+#                 },
+#                 "expected_current_king_check_from_origin_to_destination": False
+#             }
+#         ]
+#         for case in cases:
+#             with self.subTest(case["name"]):
+#                 board = Board(case["layout"])
 
-                actual_current_king_check_from_origin_to_destination = board._current_king_check_from_origin_to_destination(case["origin"], case["destination"])
+#                 actual_current_king_check_from_origin_to_destination = board._current_king_check_from_origin_to_destination(case["origin"], case["destination"])
 
-                self.assertEqual(case["expected_current_king_check_from_origin_to_destination"], actual_current_king_check_from_origin_to_destination)
+#                 self.assertEqual(case["expected_current_king_check_from_origin_to_destination"], actual_current_king_check_from_origin_to_destination)
 
-        
+# class BoardOtherKingCheck(unittest.TestCase):
+#     def test_board_other_king_check(self):
+#         cases = [
+#             {
+#                 "name": "other_king_check",
+#                 "layout": {
+#                     (3, 2): Rook(Game.WHITE),
+#                     (6, 2): King(Game.BLACK)
+#                 },
+#                 "expected_other_king_check": True
+#             },
+#             {
+#                 "name": "not_other_king_check",
+#                 "layout": {
+#                     (3, 2): Rook(Game.WHITE),
+#                     (6, 3): King(Game.BLACK)
+#                 },
+#                 "expected_other_king_check": False
+#             }
+#         ]
+#         for case in cases:
+#             with self.subTest(case["name"]):
+#                 board = Board(case["layout"])
+
+#                 actual_other_king_check = board._other_king_check()
+
+#                 self.assertEqual(case["expected_other_king_check"], actual_other_king_check)
+
+#     def test_board_other_king_can_move(self):
+#         layout = {
+#             (3, 2): Rook(Game.WHITE),
+#             (6, 2): King(Game.BLACK)
+#         }
+#         board = Board(layout)
+#         expected_other_king_can_move = True
+
+#         actual_other_king_can_move = board._other_king_can_move()
+
+#         self.assertEqual(expected_other_king_can_move, actual_other_king_can_move)
 
 if __name__ == "__main__":
     unittest.main()
