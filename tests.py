@@ -27,7 +27,8 @@ class CanMoveTestCase(unittest.TestCase):
 
     def test_create_move(self):
         formatted_string = "PA2A3"
-        move = Move(formatted_string, 0)
+        move_counter = 0
+        move = Move(formatted_string, move_counter)
         expected_origin = (6, 0)
         expected_destination = (5, 0)
         expected_color = Game.WHITE
@@ -36,9 +37,120 @@ class CanMoveTestCase(unittest.TestCase):
         self.assertEqual(expected_origin, move.get_origin())
         self.assertEqual(expected_destination, move.get_destination())
         self.assertEqual(expected_color, move.get_color())
-        self.assertEqual(type(expected_piece), type(move.get_piece()))
-        self.assertEqual(expected_piece.get_color(), move.get_piece().get_color())
+        self.assertEqual(expected_piece, move.get_piece())
         self.assertEqual(formatted_string, move.get_formatted_string())
+
+    def test_ok_origin_piece(self):
+        cases = [
+            {
+                "name": "ok_origin_piece",
+                "formatted_string": "PA2A3",
+                "expected_ok_origin_piece": True
+            },
+            {
+                "name": "not_ok_origin_piece",
+                "formatted_string": "RA2A3",
+                "expected_ok_origin_piece": False
+            }
+        ]
+        for case in cases:
+            with self.subTest(case["name"]):
+                board = Board()
+                board.create_move(case["formatted_string"])
+
+                actual_ok_origin_piece = board.ok_origin_piece()
+
+                self.assertEqual(case["expected_ok_origin_piece"], actual_ok_origin_piece)
+
+    def test_ok_origin_color(self):
+        cases = [
+            {
+                "name": "ok_origin_color",
+                "formatted_string": "PA2A3",
+                "expected_ok_origin_color": True
+            },
+            {
+                "name": "not_ok_origin_color",
+                "formatted_string": "PA7A6",
+                "expected_ok_origin_color": False
+            }
+        ]
+        for case in cases:
+            with self.subTest(case["name"]):
+                board = Board()
+                board.create_move(case["formatted_string"])
+
+                actual_ok_origin_color = board.ok_origin_color()
+
+                self.assertEqual(case["expected_ok_origin_color"], actual_ok_origin_color)
+
+    def test_can_move_from_origin_to_destination(self):
+        cases = [
+            {
+                "name": "can_move",
+                "formatted_string": "PA2A3",
+                "expected_can_move": True
+            },
+            {
+                "name": "cannot_move",
+                "formatted_string": "PA2A5",
+                "expected_can_move": False
+            }
+        ]
+        for case in cases:
+            with self.subTest(case["name"]):
+                board = Board()
+                board.create_move(case["formatted_string"])
+
+                actual_can_move = board.can_move_from_origin_to_destination()
+
+                self.assertEqual(case["expected_can_move"], actual_can_move)
+
+    def test_move_checks_king(self):
+        cases = [
+            {
+                "name": "move_checks_king",
+                "layout": {
+                    (6, 2): King(Game.WHITE),
+                    (5, 2): Queen(Game.WHITE),
+                    (3, 2): Rook(Game.BLACK)
+                },
+                "formatted_string": "QC3D3",
+                "expected_move_checks_king": True
+            },
+            {
+                "name": "move_doesnt_check_king",
+                "layout": {
+                    (6, 3): King(Game.WHITE),
+                    (5, 2): Queen(Game.WHITE),
+                    (3, 2): Rook(Game.BLACK)
+                },
+                "formatted_string": "QC3D3",
+                "expected_move_checks_king": False
+            }
+        ]
+        for case in cases:
+            with self.subTest(case["name"]):
+                board = Board(case["layout"])
+                board.create_move(case["formatted_string"])
+
+                actual_move_checks_king = board.move_checks_king()
+
+                self.assertEqual(case["expected_move_checks_king"], actual_move_checks_king)
+
+    def test_can_move(self):
+        layout = {
+            (6, 3): King(Game.WHITE),
+            (5, 2): Queen(Game.WHITE),
+            (3, 2): Rook(Game.BLACK)
+        }
+        board = Board(layout)
+        move_string = "QC3D3"
+        expected_can_move = True
+
+        actual_can_move = board.can_move(move_string)
+
+        self.assertEqual(expected_can_move, actual_can_move)
 
 ###############
 # OLD VERSION #
@@ -335,14 +447,6 @@ class KingCheckmateTestCase(unittest.TestCase):
 class BoardGetDestinationsFromOriginTestCase(unittest.TestCase):
     def test_board_get_destinations_from_origin(self):
         cases = [
-            # {
-            #     "name": "empty_origin",
-            #     "origin": (0, 0),
-            #     "layout": {
-            #         (1, 1): Pawn(Game.BLACK)
-            #     },
-            #     "expected_destinations": set(),
-            # },
             {
                 "name": "white_pawn_first_move",
                 "origin": (6, 1),
