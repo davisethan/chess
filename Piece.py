@@ -6,6 +6,9 @@ class Piece(ABC):
     def __init__(self, color: str = Game.WHITE) -> None:
         self._color = color
 
+    def __eq__(self, other):
+        return type(self) == type(other) and self._color == other._color
+
     def get_color(self):
         return self._color
 
