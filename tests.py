@@ -186,6 +186,39 @@ class EndMoveTestCase(unittest.TestCase):
 
                 self.assertEqual(case["expected_can_move_king"], actual_can_move_king)
 
+    def test_can_capture_king_attacker(self):
+        cases = [
+            {
+                "name": "can_capture_king_attacker",
+                "layout": {
+                    (3, 0): King(Game.BLACK),
+                    (5, 2): Knight(Game.BLACK),
+                    (6, 0): Rook(Game.WHITE)
+                },
+                "formatted_string": "RB2A2",
+                "expected_can_capture": True
+            },
+            {
+                "name": "cannot_capture_king_attacker",
+                "layout": {
+                    (3, 0): King(Game.BLACK),
+                    (5, 2): Knight(Game.BLACK),
+                    (6, 0): Rook(Game.WHITE),
+                    (6, 3): Bishop(Game.WHITE)
+                },
+                "formatted_string": "RB2A2",
+                "expected_can_capture": False
+            }
+        ]
+        for case in cases:
+            with self.subTest(case["name"]):
+                board = Board(case["layout"])
+                board.create_move(case["formatted_string"])
+
+                actual_can_capture = board.can_capture_king_attacker()
+
+                self.assertEqual(case["expected_can_capture"], actual_can_capture)
+
 ###############
 # OLD VERSION #
 ###############

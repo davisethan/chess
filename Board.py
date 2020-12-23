@@ -76,7 +76,7 @@ class Move:
             return King(self._color)
 
 class Board:
-    def __init__(self, layout = {}) -> None:
+    def __init__(self, layout: Dict[Tuple[int], Piece] = {}) -> None:
         default_layout = {
             (7, 0): Rook(Game.WHITE),
             (7, 1): Knight(Game.WHITE),
@@ -199,15 +199,14 @@ class Board:
     def can_move_king(self) -> bool:
         king_origin = self._get_king_origin_for_color(self._move.get_other_color())
         king_destinations = self._get_destinations_from_origin(king_origin)
-        
         can_move_king = False
         for king_destination in king_destinations:
-            if not self._can_move_king_from_origin_to_destination(king_origin, king_destination):
+            if not self._can_move_from_origin_to_destination(king_origin, king_destination):
                 can_move_king = True
 
         return can_move_king
 
-    def _can_move_king_from_origin_to_destination(self, origin: Tuple[int], destination: Tuple[int]) -> bool:
+    def _can_move_from_origin_to_destination(self, origin: Tuple[int], destination: Tuple[int]) -> bool:
         self._move_memento = self._move
         self._create_move_from_origin_and_destination(origin, destination)
         king_check = self.move_checks_king()
@@ -242,6 +241,43 @@ class Board:
             return Game.QUEEN_STRING
         else:
             return Game.KING_STRING
+
+    def can_capture_king_attacker(self) -> bool:
+        if self._over_one_king_attacker():
+            return False
+
+        attacker_origin = self._get_king_attacker_origin()
+        capture_attacker_origins = self._get_capture_attacker_origins_with_attacker_origin(attacker_origin)
+        can_capture = False
+        for capture_attacker_origin in capture_attacker_origins:
+            if not self._can_move_from_origin_to_destination(capture_attacker_origin, attacker_origin):
+                can_capture = True
+
+        return can_capture
+
+    def _over_one_king_attacker(self) -> bool:
+        return 1 < len(self._get_king_attacker_origins())
+
+    def _get_king_attacker_origins(self) -> Set[Tuple[int]]:
+        king_origin = self._get_king_origin_for_color(self._move.get_other_color())
+        attacker_origins = set()
+        for origin in self._layout:
+            if king_origin in self._get_destinations_from_origin(origin):
+                attacker_origins.add(origin)
+
+        return attacker_origins
+
+    def _get_king_attacker_origin(self) -> Tuple[int]:
+        attacker_origins = self._get_king_attacker_origins()
+        return list(attacker_origins).pop()
+
+    def _get_capture_attacker_origins_with_attacker_origin(self, attacker_origin: Tuple[int]) -> Set[Tuple[int]]:
+        capture_attacker_origins = set()
+        for origin in self._layout:
+            if attacker_origin in self._get_destinations_from_origin(origin):
+                capture_attacker_origins.add(origin)
+
+        return capture_attacker_origins
 
     ###############
     # OLD VERSION #
