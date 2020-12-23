@@ -1,5 +1,5 @@
 import re
-from typing import Dict, Set, Tuple
+from typing import Any, Dict, Set, Tuple
 from Game import Game
 from Piece import Piece, Pawn, Knight, Bishop, Rook, Queen, King
 
@@ -8,6 +8,7 @@ class Move:
         self._origin = self._get_origin_from_formatted_string(formatted_string)
         self._destination = self._get_destination_from_formatted_string(formatted_string)
         self._color = self._get_color_from_move_counter(move_counter)
+        self._other_color = self._get_other_color_from_move_counter(move_counter)
         self._piece = self._get_piece_from_formatted_string(formatted_string)
         self._formatted_string = formatted_string
 
@@ -19,6 +20,9 @@ class Move:
 
     def get_color(self) -> str:
         return self._color
+
+    def get_other_color(self) -> str:
+        return self._other_color
 
     def get_piece(self) -> Piece:
         return self._piece
@@ -49,6 +53,12 @@ class Move:
             return Game.WHITE
         else:
             return Game.BLACK
+
+    def _get_other_color_from_move_counter(self, move_counter: int) -> str:
+        if 0 == move_counter % 2:
+            return Game.BLACK
+        else:
+            return Game.WHITE
 
     def _get_piece_from_formatted_string(self, formatted_string: str) -> Piece:
         piece_string = formatted_string[0]
@@ -104,8 +114,9 @@ class Board:
 
         self._layout = layout or default_layout
         self._layout_memento = {}
-        self._moves = []
         self._move = None
+        self._move_memento = None
+        self._moves = []
 
     def can_move(self, move_string: str) -> bool:
         if not self.move_string_formatted(move_string):
@@ -181,6 +192,56 @@ class Board:
 
     def _undo_move(self) -> None:
         self._layout = self._layout_memento
+
+    def end_move(self) -> None:
+        pass
+
+    def can_move_king(self) -> bool:
+        king_origin = self._get_king_origin_for_color(self._move.get_other_color())
+        king_destinations = self._get_destinations_from_origin(king_origin)
+        
+        can_move_king = False
+        for king_destination in king_destinations:
+            if not self._can_move_king_from_origin_to_destination(king_origin, king_destination):
+                can_move_king = True
+
+        return can_move_king
+
+    def _can_move_king_from_origin_to_destination(self, origin: Tuple[int], destination: Tuple[int]) -> bool:
+        self._move_memento = self._move
+        self._create_move_from_origin_and_destination(origin, destination)
+        king_check = self.move_checks_king()
+        self._move = self._move_memento
+        return king_check
+
+    def _create_move_from_origin_and_destination(self, origin: Tuple[int], destination: Tuple[int]) -> Move:
+        origin_string = self._get_square_string_from_square(origin)
+        destination_string = self._get_square_string_from_square(destination)
+        piece_string = self._get_piece_string_from_origin(origin)
+        formatted_string = piece_string + origin_string + destination_string
+        self._move = Move(formatted_string, len(self._moves) + 1)
+
+    def _get_square_string_from_square(self, square: Tuple[int]) -> str:
+        row = square[0]
+        column = square[1]
+        row_string = Game.ROWS[::-1][row]
+        column_string = Game.COLUMNS[column]
+        return column_string + row_string
+
+    def _get_piece_string_from_origin(self, origin: Tuple[int]) -> str:
+        piece = self._layout[origin]
+        if isinstance(piece, Pawn):
+            return Game.PAWN_STRING
+        elif isinstance(piece, Knight):
+            return Game.KNIGHT_STRING
+        elif isinstance(piece, Bishop):
+            return Game.BISHOP_STRING
+        elif isinstance(piece, Rook):
+            return Game.ROOK_STRING
+        elif isinstance(piece, Queen):
+            return Game.QUEEN_STRING
+        else:
+            return Game.KING_STRING
 
     ###############
     # OLD VERSION #

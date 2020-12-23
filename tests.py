@@ -32,11 +32,13 @@ class CanMoveTestCase(unittest.TestCase):
         expected_origin = (6, 0)
         expected_destination = (5, 0)
         expected_color = Game.WHITE
+        expected_other_color = Game.BLACK
         expected_piece = Pawn(expected_color)
 
         self.assertEqual(expected_origin, move.get_origin())
         self.assertEqual(expected_destination, move.get_destination())
         self.assertEqual(expected_color, move.get_color())
+        self.assertEqual(expected_other_color, move.get_other_color())
         self.assertEqual(expected_piece, move.get_piece())
         self.assertEqual(formatted_string, move.get_formatted_string())
 
@@ -152,73 +154,105 @@ class CanMoveTestCase(unittest.TestCase):
 
         self.assertEqual(expected_can_move, actual_can_move)
 
+class EndMoveTestCase(unittest.TestCase):
+    def test_can_move_king(self):
+        cases = [
+            {
+                "name": "can_move_king",
+                "layout": {
+                    (3, 0): King(Game.BLACK),
+                    (6, 0): Rook(Game.WHITE)
+                },
+                "formatted_string": "RB2A2",
+                "expected_can_move_king": True
+            },
+            {
+                "name": "cannot_move_king",
+                "layout": {
+                    (3, 0): King(Game.BLACK),
+                    (7, 1): Queen(Game.WHITE),
+                    (6, 0): Rook(Game.WHITE)
+                },
+                "formatted_string": "RB2A2",
+                "expected_can_move_king": False
+            }
+        ]
+        for case in cases:
+            with self.subTest(case["name"]):
+                board = Board(case["layout"])
+                board.create_move(case["formatted_string"])
+
+                actual_can_move_king = board.can_move_king()
+
+                self.assertEqual(case["expected_can_move_king"], actual_can_move_king)
+
 ###############
 # OLD VERSION #
 ###############
 
 class KingCheckTestCase(unittest.TestCase):
-    @unittest.skip("")
-    def test_king_check(self):
-        cases = [
-            {
-                "name": "king_check",
-                "layout": {
-                    (6, 2): King(Game.WHITE),
-                    (3, 2): Rook(Game.BLACK)
-                },
-                "expected_king_check": True
-            },
-            {
-                "name": "not_king_check",
-                "layout": {
-                    (6, 2): King(Game.WHITE),
-                    (5, 2): Queen(Game.WHITE),
-                    (3, 2): Rook(Game.BLACK)
-                },
-                "expected_king_check": False
-            }
-        ]
-        for case in cases:
-            with self.subTest(case["name"]):
-                board = Board(case["layout"])
+    # @unittest.skip("")
+    # def test_king_check(self):
+    #     cases = [
+    #         {
+    #             "name": "king_check",
+    #             "layout": {
+    #                 (6, 2): King(Game.WHITE),
+    #                 (3, 2): Rook(Game.BLACK)
+    #             },
+    #             "expected_king_check": True
+    #         },
+    #         {
+    #             "name": "not_king_check",
+    #             "layout": {
+    #                 (6, 2): King(Game.WHITE),
+    #                 (5, 2): Queen(Game.WHITE),
+    #                 (3, 2): Rook(Game.BLACK)
+    #             },
+    #             "expected_king_check": False
+    #         }
+    #     ]
+    #     for case in cases:
+    #         with self.subTest(case["name"]):
+    #             board = Board(case["layout"])
 
-                actual_king_check = board.king_with_color_check(Game.WHITE)
+    #             actual_king_check = board.king_with_color_check(Game.WHITE)
 
-                self.assertEqual(case["expected_king_check"], actual_king_check)
+    #             self.assertEqual(case["expected_king_check"], actual_king_check)
 
-    @unittest.skip("")
-    def test_move_from_origin_to_destination_makes_king_with_color_check(self):
-        cases = [
-            {
-                "name": "king_check",
-                "layout": {
-                    (6, 2): King(Game.WHITE),
-                    (5, 2): Queen(Game.WHITE),
-                    (3, 2): Rook(Game.BLACK)
-                },
-                "origin": (5, 2),
-                "destination": (5, 3),
-                "expected_king_check": True
-            },
-            {
-                "name": "not_king_check",
-                "layout": {
-                    (6, 3): King(Game.WHITE),
-                    (5, 2): Queen(Game.WHITE),
-                    (3, 2): Rook(Game.BLACK)
-                },
-                "origin": (5, 2),
-                "destination": (5, 3),
-                "expected_king_check": False
-            }
-        ]
-        for case in cases:
-            with self.subTest(case["name"]):
-                board = Board(case["layout"])
+    # @unittest.skip("")
+    # def test_move_from_origin_to_destination_makes_king_with_color_check(self):
+    #     cases = [
+    #         {
+    #             "name": "king_check",
+    #             "layout": {
+    #                 (6, 2): King(Game.WHITE),
+    #                 (5, 2): Queen(Game.WHITE),
+    #                 (3, 2): Rook(Game.BLACK)
+    #             },
+    #             "origin": (5, 2),
+    #             "destination": (5, 3),
+    #             "expected_king_check": True
+    #         },
+    #         {
+    #             "name": "not_king_check",
+    #             "layout": {
+    #                 (6, 3): King(Game.WHITE),
+    #                 (5, 2): Queen(Game.WHITE),
+    #                 (3, 2): Rook(Game.BLACK)
+    #             },
+    #             "origin": (5, 2),
+    #             "destination": (5, 3),
+    #             "expected_king_check": False
+    #         }
+    #     ]
+    #     for case in cases:
+    #         with self.subTest(case["name"]):
+    #             board = Board(case["layout"])
 
-                actual_king_check = board.move_from_origin_to_destination_makes_king_with_color_check(case["origin"], case["destination"], Game.WHITE)
+    #             actual_king_check = board.move_from_origin_to_destination_makes_king_with_color_check(case["origin"], case["destination"], Game.WHITE)
 
-                self.assertEqual(case["expected_king_check"], actual_king_check)
+    #             self.assertEqual(case["expected_king_check"], actual_king_check)
 
     @unittest.skip("")
     def test_king_with_color_can_move(self):
