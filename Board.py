@@ -65,8 +65,8 @@ class Board:
         self._layout.pop(origin)
         # King check
         king_check = self.king_with_color_check(color)
-        if king_check:
-            self._layout = memento
+        # if king_check:
+        self._layout = memento
         return king_check
 
     def king_with_color_can_move(self, color: str) -> bool:
@@ -90,20 +90,117 @@ class Board:
                 king_origin = origin
 
         king_attacker_origins = set()
-        same_color_destinations = set()
         for origin in self._layout:
             if king_origin in self._get_destinations_from_origin(origin):
                 king_attacker_origins.add(origin)
-            if color == self._layout[origin].get_color():
-                same_color_destinations |= self._get_destinations_from_origin(origin)
 
         if 1 < len(king_attacker_origins):
             return False
+        king_attacker_origin = tuple(king_attacker_origins)[0]
         
-        if 0 < len(king_attacker_origins & same_color_destinations):
-            return True
-        else:
-            return False
+        capture_king_attacker_origins = set()
+        for origin in self._layout:
+            if king_attacker_origin in self._get_destinations_from_origin(origin):
+                capture_king_attacker_origins.add(origin)
+        can_capture_king_attacker = False
+        for capture_king_attack_origin in capture_king_attacker_origins:
+            if not self.move_from_origin_to_destination_makes_king_with_color_check(capture_king_attack_origin, king_attacker_origin, color):
+                can_capture_king_attacker = True
+
+        return can_capture_king_attacker
+
+    def can_block_king_with_color_attacker(self, color: str) -> bool:
+        king_origin = tuple()
+        for origin in self._layout:
+            if isinstance(self._layout[origin], King) and color == self._layout[origin].get_color():
+                king_origin = origin
+
+        king_attacker_origin = tuple()
+        for origin in self._layout:
+            if king_origin in self._get_destinations_from_origin(origin):
+                king_attacker_origin = origin
+
+        destinations = set()
+        row = king_origin[0]
+        column = king_origin[1]
+        other_row = king_attacker_origin[0]
+        other_column = king_attacker_origin[1]
+        # up vertical
+        if row > other_row and column == other_column:
+            index = 1
+            destination = (row - index, column)
+            while king_attacker_origin != destination:
+                destinations.add(destination)
+                index += 1
+                destination = (row - index, column)
+        # up right diagonal
+        elif row > other_row and column < other_column and abs(row - other_row) == abs(column - other_column):
+            index = 1
+            destination = (row - index, column + index)
+            while king_attacker_origin != destination:
+                destinations.add(destination)
+                index += 1
+                destination = (row - index, column + index)
+        # right horizontal
+        elif row == other_row and column < other_column:
+            index = 1
+            destination = (row, column + index)
+            while king_attacker_origin != destination:
+                destinations.add(destination)
+                index += 1
+                destination = (row, column + index)
+        # right down diagonal
+        elif row < other_row and column < other_column:
+            index = 1
+            destination = (row + index, column + index)
+            while king_attacker_origin != destination:
+                destinations.add(destination)
+                index += 1
+                destination = (row + index, column + index)
+        # down vertical
+        elif row < other_row and column == other_column:
+            index = 1
+            destination = (row + index, column)
+            while king_attacker_origin != destination:
+                destinations.add(destination)
+                index += 1
+                destination = (row + index, column)
+        # down left diagonal
+        elif row < other_row and column > other_column:
+            index = 1
+            destination = (row + index, column - index)
+            while king_attacker_origin != destination:
+                destinations.add(destination)
+                index += 1
+                destination = (row + index, column - index)
+        # left horizontal
+        elif row == other_row and column > other_column:
+            index = 1
+            destination = (row, column - index)
+            while king_attacker_origin != destination:
+                destinations.add(destination)
+                index += 1
+                destination = (row, column - index)
+        # up left diagonal
+        elif row > other_row and column > other_column:
+            index = 1
+            destination = (row - index, column - index)
+            while king_attacker_origin != destination:
+                destinations.add(destination)
+                index += 1
+                destination = (row - index, column - index)
+
+        block_king_attacker_origins = set()
+        for origin in self._layout:
+            if color == self._layout[origin].get_color() and 0 < len(destinations & self._get_destinations_from_origin(origin)):
+                block_king_attacker_origins.add(origin)
+        can_block_king_attacker = False
+        for block_king_attacker_origin in block_king_attacker_origins:
+            for destination in destinations:
+                if not self.move_from_origin_to_destination_makes_king_with_color_check(block_king_attacker_origin, destination, color):
+                    can_block_king_attacker = True
+
+        return can_block_king_attacker
 
 
     def set_move(self, move: str) -> None:
