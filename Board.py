@@ -3,6 +3,68 @@ from typing import Dict, Set, Tuple
 from Game import Game
 from Piece import Piece, Pawn, Knight, Bishop, Rook, Queen, King
 
+class Move:
+    def __init__(self, formatted_string: str, move_counter: int) -> None:
+        self._origin = self._get_origin_from_formatted_string(formatted_string)
+        self._destination = self._get_destination_from_formatted_string(formatted_string)
+        self._color = self._get_color_from_move_counter(move_counter)
+        self._piece = self._get_piece_from_formatted_string(formatted_string)
+        self._formatted_string = formatted_string
+
+    def get_origin(self) -> Tuple[int]:
+        return self._origin
+
+    def get_destination(self) -> Tuple[int]:
+        return self._destination
+
+    def get_color(self) -> str:
+        return self._color
+
+    def get_piece(self) -> Piece:
+        return self._piece
+
+    def get_formatted_string(self) -> str:
+        return self._formatted_string
+
+    def _get_origin_from_formatted_string(self, formatted_string: str) -> Tuple[int]:
+        origin_string = formatted_string[1:3]
+        row = self._get_row_from_square_string(origin_string)
+        column = self._get_column_from_square_string(origin_string)
+        return (row, column)
+    
+    def _get_row_from_square_string(self, square_string: str) -> int:
+        return Game.ROWS[::-1].index(square_string[1])
+
+    def _get_column_from_square_string(self, square_string: str) -> int:
+        return Game.COLUMNS.index(square_string[0])
+
+    def _get_destination_from_formatted_string(self, formatted_string: str) -> Tuple[int]:
+        destination_string = formatted_string[3:5]
+        row = self._get_row_from_square_string(destination_string)
+        column = self._get_column_from_square_string(destination_string)
+        return (row, column)
+
+    def _get_color_from_move_counter(self, move_counter: int) -> str:
+        if 0 == move_counter % 2:
+            return Game.WHITE
+        else:
+            return Game.BLACK
+
+    def _get_piece_from_formatted_string(self, formatted_string: str) -> Piece:
+        piece_string = formatted_string[0]
+        if "P" == piece_string:
+            return Pawn(self._color)
+        elif "N" == piece_string:
+            return Knight(self._color)
+        elif "B" == piece_string:
+            return Bishop(self._color)
+        elif "R" == piece_string:
+            return Rook(self._color)
+        elif "Q" == piece_string:
+            return Queen(self._color)
+        else:
+            return King(self._color)
+
 class Board:
     def __init__(self, layout = {}) -> None:
         default_layout = {
@@ -42,8 +104,22 @@ class Board:
 
         self._layout = layout or default_layout
         self._moves = []
-        self._move = ""
+        self._move = None
 
+    def can_move(self, move_string: str) -> bool:
+        if not self.move_string_formatted(move_string):
+            return False
+        else:
+            self._move = Move(move_string)
+
+    def move_string_formatted(self, move_string: str) -> bool:
+        regex = "^[P|N|B|R|Q|K][A-H][1-8][A-H][1-8]$"
+        return None != re.search(regex, move_string)
+        
+
+    ###############
+    # OLD VERSION #
+    ###############
 
     def king_with_color_check(self, color: str) -> bool:
         king_origin = tuple()
@@ -68,6 +144,16 @@ class Board:
         # if king_check:
         self._layout = memento
         return king_check
+
+    def king_with_color_checkmate(self, color: str) -> bool:
+        if self.king_with_color_can_move(color):
+            return False
+        elif self.can_capture_king_with_color_attacker(color):
+            return False
+        elif self.can_block_king_with_color_attacker(color):
+            return False
+        else:
+            return True
 
     def king_with_color_can_move(self, color: str) -> bool:
         king_origin = tuple()
@@ -220,10 +306,6 @@ class Board:
         else:
             return True
 
-    def _is_correct_move_format(self) -> bool:
-        regex = "^[P|N|B|R|Q|K][A-H][1-8][A-H][1-8]$"
-        return None != re.search(regex, self._move)
-
     def _is_correct_origin_piece(self) -> bool:
         origin = self._get_origin_from_move()
         move_piece = self._move[0]
@@ -248,8 +330,9 @@ class Board:
         column = Game.COLUMNS.index(move_origin[0])
         return (row, column)
 
-    # def _is_correct_origin_color(self) -> bool:
-    #     current_color = 
+    def _is_correct_origin_color(self) -> bool:
+        current_color = self._get_current_color()
+        
 
     # def add_move(self, move: str) -> None:
     #     self._moves.append(move)
@@ -298,17 +381,17 @@ class Board:
 
     #     return current_king_origin in destinations
 
-    # def _get_current_color(self) -> str:
-    #     if 0 == len(self._moves) % 2:
-    #         return Game.WHITE
-    #     else:
-    #         return Game.BLACK
+    def _get_current_color(self) -> str:
+        if 0 == len(self._moves) % 2:
+            return Game.WHITE
+        else:
+            return Game.BLACK
 
-    # def _get_other_color(self) -> str:
-    #     if 0 == len(self._moves) % 2:
-    #         return Game.BLACK
-    #     else:
-    #         return Game.WHITE
+    def _get_other_color(self) -> str:
+        if 0 == len(self._moves) % 2:
+            return Game.BLACK
+        else:
+            return Game.WHITE
 
     # def _get_layout_from_origin_to_destination(self, origin: Tuple[int], destination: Tuple[int]) -> Dict[Tuple[int], Piece]:
     #     layout = dict(self._layout)
