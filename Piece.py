@@ -3,7 +3,7 @@ from abc import ABC
 from Game import Game
 
 class Piece(ABC):
-    def __init__(self, color: str = Game.WHITE) -> None:
+    def __init__(self, color) -> None:
         self._color = color
 
     def __eq__(self, other):
@@ -264,8 +264,8 @@ class Queen(Piece):
     def get_layout_destinations_from_origin(self, layout: Dict[Tuple[int], Piece], origin: Tuple[int]) -> Set[Tuple[int]]:
         destinations = set()
 
-        destinations |= Bishop().get_layout_destinations_from_origin(layout, origin)
-        destinations |= Rook().get_layout_destinations_from_origin(layout, origin)
+        destinations |= Bishop(self.get_color()).get_layout_destinations_from_origin(layout, origin)
+        destinations |= Rook(self.get_color()).get_layout_destinations_from_origin(layout, origin)
 
         return destinations
 
