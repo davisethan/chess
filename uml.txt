@@ -83,3 +83,5 @@ Limits
 1. Pawn promotion
 2. Castle
 3. En passant
+4. Stalemate
+5. Draw
