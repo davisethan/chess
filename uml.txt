@@ -16,14 +16,20 @@ WHITE_PAWN_ROW: int = 6
 BLACK_PAWN_ROW: int = 1
 
 Board
-- layout: Dict[str, Piece]
+- layout: Dict[Tuple[int], Piece]
 - moves: List[str]
 + get_destinations_from_orgin(origin: Tuple[int]) -> Set[Tuple[int]]
-+ is_destination_from_origin(origin: Tuple[int]) -> bool
 
 Piece
-- color: str = "WHITE" | "BLACK"
-+ get_layout_destinations_from_origin(layout: Dict[Tuple[int], Piece], origin: str) -> Set[str]
+- color: str = WHITE | BLACK
++ get_layout_destinations_from_origin(layout: Dict[Tuple[int], Piece], origin: str) -> Set[Tuple[int]]
+
+Move
+- origin: Tuple[int]
+- destination: Tuple[int]
+- color: str = WHITE | BLACK
+- piece: Piece
+- formatted_string: str
 
 Chess
 + make_move() -> None
@@ -33,35 +39,38 @@ Algorithms
 
 1. make_move
     1.1. can_move
-        1.1.1. move_color_correct
-            1.1.1.1. Even num moves and piece white
-            1.1.1.2. Odd num moves and piece black
-        1.1.2. is_destination_from_origin
-            1.1.2.1. Destination in destinations from piece at origin
-        1.1.3. is_king_check
-            1.1.3.1. Save layout memento
-            1.1.3.2. do move
-            1.1.3.3. Is King origin a destination of any other color piece
+        1.1.1. move_string_formatted
+            1.1.1.1. regex match
+        1.1.2. ok_origin_piece
+            1.1.2.1. origin piece equals formatted piece
+        1.1.3. ok_origin_color
+            1.1.3.1. origin color equals formatted color
+        1.1.4. can_move_from_origin_to_destination
+            1.1.4.1. destination in get_destinations_with_origin
+        1.1.5. move_checks_king
+            1.1.5.1. try_move
+                1.1.5.1.1. do_move
+                1.1.5.1.2. king_origin is destination in get_destinations_with_color
+                1.1.5.1.3. undo_move
     1.2. do_move
-        1.2.1. Change state
+        1.2.1. origin to destination
+        1.2.2. clear origin
     1.3. end_move
         1.3.1. king_check
-            1.3.1.1. Find other King point
-            1.3.1.2. Current pieces can attack other King point
+            1.3.1.1. king_origin is destination in get_destination_with_color
         1.3.2. king_checkmate
-            1.3.2.1. king_can_move
-                1.3.2.1.1. Get other King attack points
-                1.3.2.1.2. Own pieces can_move to other King attack points
-                1.3.2.1.3. Over one own piece can attack other King point
-            1.3.2.2. can_capture_attack_piece
-                1.3.2.2.1. Other piece can_move to own attack piece point
-            1.3.2.3. can_block_attack_piece
-                1.3.2.3.1. king_queen_check
-                    1.3.2.3.1.1. Other King (as Queen) can attack own Rook or Queen in up vertical
-                    1.3.2.3.1.2. Other piece can_move to point between own Rook or Queen
-                    1.3.2.3.1.3. Other King (as Queen) can attack own Bishop or Queen in up right diagonal
-                    1.3.2.3.1.4. Other piece can_move to point between own Bishop or Queen
-                    ...
+            1.3.2.1. can_move_king
+                1.3.2.1.1. get_destinations_with_king_origin
+                1.3.2.1.2. for each destination try_move
+            1.3.2.2. can_capture_king_attacker
+                1.3.2.2.1. king_origin in get_destinations_with_attacker_origin
+                1.3.2.2.2. can_move_from_saver_origin_to_attacker_origin
+                1.3.2.2.3. move_checks_king
+            1.3.2.3. can_block_king_attacker
+                1.3.2.3.1. get_destination_between_king_and_ranged_attacker
+                    1.3.2.3.1.1. check direction for bishop, rook, or queen
+                1.3.2.3.2. can_move_from_saver_origin_to_destination_bewtween_king_and_ranged_attacker
+                1.3.2.3.2. move_checks_king
 
 Design Patterns
 ---------------
@@ -74,3 +83,5 @@ Limits
 1. Pawn promotion
 2. Castle
 3. En passant
+4. Stalemate
+5. Draw
