@@ -1,5 +1,6 @@
 import unittest
 from Board import Board, Move
+from Chess import Chess
 from Game import Game
 from Piece import Pawn, Knight, Bishop, Rook, Queen, King
 
@@ -587,6 +588,20 @@ class BoardGetDestinationsFromOriginTestCase(unittest.TestCase):
                 actual_destinations = board._get_destinations_from_origin(case["origin"])
 
                 self.assertEqual(case["expected_destinations"], actual_destinations)
+
+class PlayToCheckmateTestCase(unittest.TestCase):
+    def test_play_to_checkmate(self):
+        prints = ["Check!", "Checkmate"][::-1]
+        def test_print(statement):
+            self.assertEqual(prints.pop(), statement)
+
+        inputs = ["Make move:", "Make move:", "Make move:", "Make move:", "Make move:", "Make move:", "Make move:"][::-1]
+        prompts = ["PE2E4", "PE7E5", "BF1C4", "NB8C6", "QD1F3", "PB7B6", "QF3F7"][::-1]
+        def test_input(statement):
+            self.assertEqual(inputs.pop(), statement)
+            return prompts.pop()
+
+        Chess.play(test_print, test_input)
 
 if __name__ == "__main__":
     unittest.main()

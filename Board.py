@@ -163,12 +163,12 @@ class Board:
         return destinations
 
     def move_checks_king(self) -> bool:
-        self._do_move()
+        self.do_move()
         king_check = self._king_check_for_color(self._move.get_color())
         self._undo_move()
         return king_check
 
-    def _do_move(self) -> None:
+    def do_move(self) -> None:
         self._layout_memento = dict(self._layout)
         self._layout[self._move.get_destination()] = self._layout[self._move.get_origin()]
         self._layout.pop(self._move.get_origin())
