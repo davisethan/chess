@@ -208,6 +208,28 @@ class EndMoveTestCase(unittest.TestCase):
                 },
                 "formatted_string": "RB2A2",
                 "expected_can_capture": False
+            },
+            {
+                "name": "cannot_capture_king_attacker_makes_check",
+                "layout": {
+                    (3, 0): King(Game.BLACK),
+                    (5, 2): Knight(Game.BLACK),
+                    (6, 0): Rook(Game.WHITE),
+                    (6, 3): Bishop(Game.WHITE)
+                },
+                "formatted_string": "RB2A2",
+                "expected_can_capture": False
+            },
+            {
+                "name": "cannot_capture_king_attacker_two_attackers",
+                "layout": {
+                    (3, 0): King(Game.BLACK),
+                    (5, 2): Knight(Game.BLACK),
+                    (6, 0): Rook(Game.WHITE),
+                    (4, 2): Knight(Game.WHITE)
+                },
+                "formatted_string": "NA3C4",
+                "expected_can_capture": False
             }
         ]
         for case in cases:
@@ -219,297 +241,144 @@ class EndMoveTestCase(unittest.TestCase):
 
                 self.assertEqual(case["expected_can_capture"], actual_can_capture)
 
-###############
-# OLD VERSION #
-###############
-
-class KingCheckTestCase(unittest.TestCase):
-    # @unittest.skip("")
-    # def test_king_check(self):
-    #     cases = [
-    #         {
-    #             "name": "king_check",
-    #             "layout": {
-    #                 (6, 2): King(Game.WHITE),
-    #                 (3, 2): Rook(Game.BLACK)
-    #             },
-    #             "expected_king_check": True
-    #         },
-    #         {
-    #             "name": "not_king_check",
-    #             "layout": {
-    #                 (6, 2): King(Game.WHITE),
-    #                 (5, 2): Queen(Game.WHITE),
-    #                 (3, 2): Rook(Game.BLACK)
-    #             },
-    #             "expected_king_check": False
-    #         }
-    #     ]
-    #     for case in cases:
-    #         with self.subTest(case["name"]):
-    #             board = Board(case["layout"])
-
-    #             actual_king_check = board.king_with_color_check(Game.WHITE)
-
-    #             self.assertEqual(case["expected_king_check"], actual_king_check)
-
-    # @unittest.skip("")
-    # def test_move_from_origin_to_destination_makes_king_with_color_check(self):
-    #     cases = [
-    #         {
-    #             "name": "king_check",
-    #             "layout": {
-    #                 (6, 2): King(Game.WHITE),
-    #                 (5, 2): Queen(Game.WHITE),
-    #                 (3, 2): Rook(Game.BLACK)
-    #             },
-    #             "origin": (5, 2),
-    #             "destination": (5, 3),
-    #             "expected_king_check": True
-    #         },
-    #         {
-    #             "name": "not_king_check",
-    #             "layout": {
-    #                 (6, 3): King(Game.WHITE),
-    #                 (5, 2): Queen(Game.WHITE),
-    #                 (3, 2): Rook(Game.BLACK)
-    #             },
-    #             "origin": (5, 2),
-    #             "destination": (5, 3),
-    #             "expected_king_check": False
-    #         }
-    #     ]
-    #     for case in cases:
-    #         with self.subTest(case["name"]):
-    #             board = Board(case["layout"])
-
-    #             actual_king_check = board.move_from_origin_to_destination_makes_king_with_color_check(case["origin"], case["destination"], Game.WHITE)
-
-    #             self.assertEqual(case["expected_king_check"], actual_king_check)
-
-    @unittest.skip("")
-    def test_king_with_color_can_move(self):
+    def test_can_block_king_attacker(self):
         cases = [
             {
-                "name": "king_can_move",
+                "name": "can_block_king_attacker_up_vertical",
                 "layout": {
-                    (6, 2): King(Game.WHITE),
-                    (3, 2): Rook(Game.BLACK)
+                    (3, 3): King(Game.BLACK),
+                    (0, 3): Rook(Game.WHITE),
+                    (1, 4): Queen(Game.BLACK)
                 },
-                "expected_king_can_move": True
+                "formatted_string": "RC8D8",
+                "expected_can_block": True
             },
             {
-                "name": "king_can_not_move",
+                "name": "can_block_king_attacker_up_right_diagonal",
                 "layout": {
-                    (6, 2): King(Game.WHITE),
-                    (5, 1): Knight(Game.WHITE),
-                    (6, 1): Knight(Game.WHITE),
-                    (7, 1): Knight(Game.WHITE),
-                    (7, 2): Knight(Game.WHITE),
-                    (7, 3): Knight(Game.WHITE),
-                    (6, 3): Knight(Game.WHITE),
-                    (5, 3): Knight(Game.WHITE),
-                    (3, 2): Rook(Game.BLACK)
+                    (3, 3): King(Game.BLACK),
+                    (0, 6): Bishop(Game.WHITE),
+                    (1, 4): Queen(Game.BLACK)
                 },
-                "expected_king_can_move": False
-            },
-            {
-                "name": "king_can_not_move_down",
-                "layout": {
-                    (0, 7): Rook(Game.BLACK),
-                    (3, 7): King(Game.WHITE),
-                    (2, 6): Pawn(Game.WHITE),
-                    (3, 6): Pawn(Game.WHITE),
-                    (4, 6): Pawn(Game.WHITE)
-                },
-                "expected_king_can_move": False
-            }
-        ]
-        for case in cases:
-            with self.subTest(case["name"]):
-                board = Board(case["layout"])
-
-                actual_king_can_move = board.king_with_color_can_move(Game.WHITE)
-
-                self.assertEqual(case["expected_king_can_move"], actual_king_can_move)
-
-    @unittest.skip("")
-    def test_can_capture_king_with_color_attacker(self):
-        cases = [
-            {
-                "name": "can_capture_king_attacker",
-                "layout": {
-                    (6, 2): King(Game.WHITE),
-                    (3, 2): Rook(Game.BLACK),
-                    (3, 3): Queen(Game.WHITE)
-                },
-                "expected_can_capture_king_attacker": True
-            },
-            {
-                "name": "two_attackers_can_not_capture_king_attacker",
-                "layout": {
-                    (6, 2): King(Game.WHITE),
-                    (3, 2): Rook(Game.BLACK),
-                    (3, 3): Queen(Game.WHITE),
-                    (5, 4): Knight(Game.BLACK)
-                },
-                "expected_can_capture_king_attacker": False
-            },
-            {
-                "name": "can_not_capture_king_attacker",
-                "layout": {
-                    (6, 2): King(Game.WHITE),
-                    (3, 2): Rook(Game.BLACK),
-                    (5, 3): Queen(Game.WHITE)
-                },
-                "expected_can_capture_king_attacker": False
-            },
-            {
-                "name": "can_not_capture_king_attacker_makes_check",
-                "layout": {
-                    (6, 2): King(Game.WHITE),
-                    (3, 2): Rook(Game.BLACK),
-                    (6, 6): Rook(Game.BLACK),
-                    (6, 5): Queen(Game.WHITE)
-                },
-                "expected_can_capture_king_attacker": False
-            }
-        ]
-        for case in cases:
-            with self.subTest(case["name"]):
-                board = Board(case["layout"])
-
-                actual_can_capture_king_attacker = board.can_capture_king_with_color_attacker(Game.WHITE)
-
-                self.assertEqual(case["expected_can_capture_king_attacker"], actual_can_capture_king_attacker)
-
-    @unittest.skip("")
-    def test_can_block_king_with_color_attacker(self):
-        cases = [
-            {
-                "name": "can_block_king_attacker",
-                "layout": {
-                    (6, 2): King(Game.WHITE),
-                    (3, 2): Rook(Game.BLACK),
-                    (5, 3): Queen(Game.WHITE)
-                },
-                "expected_can_block_king_attacker": True
-            },
-            {
-                "name": "can_not_block_king_attacker",
-                "layout": {
-                    (6, 2): King(Game.WHITE),
-                    (3, 2): Rook(Game.BLACK),
-                    (7, 2): Queen(Game.WHITE)
-                },
-                "expected_can_block_king_attacker": False
-            },
-            {
-                "name": "can_not_block_king_attacker_makes_check",
-                "layout": {
-                    (6, 2): King(Game.WHITE),
-                    (3, 2): Rook(Game.BLACK),
-                    (6, 4): Queen(Game.WHITE),
-                    (6, 5): Rook(Game.BLACK)
-                },
-                "expected_can_block_king_attacker": False
-            },
-            {
-                "name": "can_block_king_attacker_bishop",
-                "layout": {
-                    (6, 2): King(Game.WHITE),
-                    (3, 5): Bishop(Game.BLACK),
-                    (6, 4): Queen(Game.WHITE)
-                },
-                "expected_can_block_king_attacker": True
-            },
-            {
-                "name": "can_not_block_king_attacker_bishop_makes_check",
-                "layout": {
-                    (6, 2): King(Game.WHITE),
-                    (3, 5): Bishop(Game.BLACK),
-                    (6, 4): Queen(Game.WHITE),
-                    (6, 5): Rook(Game.BLACK)
-                },
-                "expected_can_block_king_attacker": False
+                "formatted_string": "BH7G8",
+                "expected_can_block": True
             },
             {
                 "name": "can_block_king_attacker_right_horizontal",
                 "layout": {
-                    (6, 2): King(Game.WHITE),
-                    (6, 5): Rook(Game.BLACK),
-                    (5, 4): Queen(Game.WHITE)
+                    (3, 3): King(Game.BLACK),
+                    (3, 6): Rook(Game.WHITE),
+                    (1, 4): Queen(Game.BLACK)
                 },
-                "expected_can_block_king_attacker": True
+                "formatted_string": "RG6G5",
+                "expected_can_block": True
             },
             {
-                "name": "can_block_king_attacker_right_down_diagonal",
+                "name": "can_block_king_attacker_down_right_diagonal",
                 "layout": {
-                    (4, 2): King(Game.WHITE),
-                    (7, 5): Bishop(Game.BLACK),
-                    (5, 4): Queen(Game.WHITE)
+                    (3, 3): King(Game.BLACK),
+                    (6, 6): Bishop(Game.WHITE),
+                    (1, 4): Queen(Game.BLACK)
                 },
-                "expected_can_block_king_attacker": True
+                "formatted_string": "BF1G2",
+                "expected_can_block": True
             },
             {
                 "name": "can_block_king_attacker_down_vertical",
                 "layout": {
-                    (4, 2): King(Game.WHITE),
-                    (7, 2): Rook(Game.BLACK),
-                    (6, 3): Queen(Game.WHITE)
+                    (3, 3): King(Game.BLACK),
+                    (6, 3): Rook(Game.WHITE),
+                    (5, 2): Queen(Game.BLACK)
                 },
-                "expected_can_block_king_attacker": True
+                "formatted_string": "RB2A2",
+                "expected_can_block": True
             },
             {
                 "name": "can_block_king_attacker_down_left_diagonal",
                 "layout": {
-                    (3, 3): King(Game.WHITE),
-                    (6, 0): Bishop(Game.BLACK),
-                    (5, 2): Queen(Game.WHITE)
+                    (3, 3): King(Game.BLACK),
+                    (6, 0): Bishop(Game.WHITE),
+                    (5, 2): Queen(Game.BLACK)
                 },
-                "expected_can_block_king_attacker": True
+                "formatted_string": "BB1A2",
+                "expected_can_block": True
             },
             {
-                "name": "can_block_king_attack_left_horizontal",
+                "name": "can_block_king_attacker_left_horizontal",
                 "layout": {
-                    (3, 3): King(Game.WHITE),
-                    (3, 0): Rook(Game.BLACK),
-                    (4, 1): Queen(Game.WHITE)
+                    (3, 3): King(Game.BLACK),
+                    (3, 0): Rook(Game.WHITE),
+                    (5, 2): Queen(Game.BLACK)
                 },
-                "expected_can_block_king_attacker": True
+                "formatted_string": "RA4A5",
+                "expected_can_block": True
             },
             {
-                "name": "can_block_king_attack_up_left_diagonal",
+                "name": "can_block_king_attacker_up_left_diagonal",
                 "layout": {
-                    (3, 3): King(Game.WHITE),
-                    (0, 0): Bishop(Game.BLACK),
-                    (2, 1): Queen(Game.WHITE)
+                    (3, 3): King(Game.BLACK),
+                    (0, 0): Queen(Game.WHITE),
+                    (5, 2): Queen(Game.BLACK)
                 },
-                "expected_can_block_king_attacker": True
+                "formatted_string": "QA7A8",
+                "expected_can_block": True
+            },
+            {
+                "name": "cannot_block_king_attacker",
+                "layout": {
+                    (3, 0): King(Game.BLACK),
+                    (5, 2): Bishop(Game.BLACK),
+                    (6, 0): Rook(Game.WHITE)
+                },
+                "formatted_string": "RB2A2",
+                "expected_can_block": False
+            },
+            {
+                "name": "cannot_block_king_attacker_makes_check",
+                "layout": {
+                    (3, 0): King(Game.BLACK),
+                    (5, 2): Knight(Game.BLACK),
+                    (6, 0): Rook(Game.WHITE),
+                    (6, 3): Bishop(Game.WHITE)
+                },
+                "formatted_string": "RB2A2",
+                "expected_can_block": False
+            },
+            {
+                "name": "cannot_block_king_attacker_two_attackers",
+                "layout": {
+                    (3, 0): King(Game.BLACK),
+                    (5, 2): Knight(Game.BLACK),
+                    (6, 0): Rook(Game.WHITE),
+                    (4, 2): Knight(Game.WHITE)
+                },
+                "formatted_string": "NA3C4",
+                "expected_can_block": False
             }
         ]
         for case in cases:
             with self.subTest(case["name"]):
                 board = Board(case["layout"])
+                board.create_move(case["formatted_string"])
 
-                actual_can_block_king_attacker = board.can_block_king_with_color_attacker(Game.WHITE)
+                actual_can_block = board.can_block_king_attacker()
 
-                self.assertEqual(case["expected_can_block_king_attacker"], actual_can_block_king_attacker)
+                self.assertEqual(case["expected_can_block"], actual_can_block)
 
-class KingCheckmateTestCase(unittest.TestCase):
-    @unittest.skip("")
-    def test_king_with_color_checkmate(self):
+    def test_king_checkmate(self):
         layout = {
-            (0, 7): Rook(Game.BLACK),
-            (0, 6): Queen(Game.BLACK),
-            (2, 7): King(Game.WHITE)
+            (3, 0): King(Game.BLACK),
+            (6, 0): Rook(Game.WHITE),
+            (7, 1): Queen(Game.WHITE)
         }
         board = Board(layout)
-        expected_king_checkmate = True
+        formatted_string = "RB2A2"
+        board.create_move(formatted_string)
+        expected_checkmate = True
 
-        actual_king_checkmate = board.king_with_color_checkmate(Game.WHITE)
+        actual_checkmate = board.king_checkmate()
 
-        self.assertEqual(expected_king_checkmate, actual_king_checkmate)
+        self.assertEqual(expected_checkmate, actual_checkmate)
 
 class BoardGetDestinationsFromOriginTestCase(unittest.TestCase):
     def test_board_get_destinations_from_origin(self):
